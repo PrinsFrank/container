@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace PrinsFrank\Container\Definition;
 
+use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Definition\Item\Definition;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 
@@ -27,13 +28,13 @@ final class DefinitionSet {
      * @throws ShouldNotHappenException
      * @return T
      */
-    public function get(string $identifier): object {
+    public function get(string $identifier, Container $container): object {
         foreach ($this->definitions as $definition) {
             if ($definition->isFor($identifier) === false) {
                 continue;
             }
 
-            return $definition->get();
+            return $definition->get($container);
         }
 
         throw new ShouldNotHappenException();

@@ -5,7 +5,9 @@ namespace PrinsFrank\Container\Definition\Item;
 
 use Closure;
 use Override;
+use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
+use PrinsFrank\Container\Exception\ShouldNotHappenException;
 
 /** @implements Definition<object> */
 final readonly class Concrete implements Definition {
@@ -25,7 +27,12 @@ final readonly class Concrete implements Definition {
     }
 
     #[Override]
-    public function get(): object {
-        return $this->new->__invoke();
+    public function get(Container $container): object {
+        $resolved = $container->invoke($this->new);
+        if ($resolved instanceof $this->identifier === false) {
+            throw new ShouldNotHappenException();
+        }
+
+        return $resolved;
     }
 }

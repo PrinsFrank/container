@@ -10,6 +10,7 @@ use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Definition\DefinitionSet;
 use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
+use ReflectionMethod;
 
 final class Container implements ContainerInterface {
     /** @var list<ServiceProviderInterface> */
@@ -29,7 +30,7 @@ final class Container implements ContainerInterface {
     #[Override]
     public function get(string $id): object {
         if ($this->resolvedSet->has($id)) {
-            return $this->resolvedSet->get($id);
+            return $this->resolvedSet->get($id, $this);
         }
 
         foreach ($this->serviceProvider as $serviceProvider) {
@@ -42,7 +43,7 @@ final class Container implements ContainerInterface {
                 throw new InvalidServiceProviderException($serviceProvider::class);
             }
 
-            return $this->resolvedSet->get($id);
+            return $this->resolvedSet->get($id, $this);
         }
 
         throw new UnresolvableException();
@@ -62,6 +63,37 @@ final class Container implements ContainerInterface {
         }
 
         return false;
+    }
+
+    /**
+     * @template T of object
+     * @param class-string<T>
+     * @return T
+     */
+    public function construct(string $identifier): object {
+        return $this->call($identifier, '__construct');
+    }
+
+    public function invoke(callable|object $identifier): mixed {
+        return $this->call($identifier, '__invoke');
+    }
+
+    /**
+     * @param class-string<object>|callable|object $identifier
+     * @throws UnresolvableException
+     */
+    public function call(string|callable|object $identifier, string $methodName): mixed {
+        $params = [];
+        foreach ((new ReflectionMethod($identifier, $methodName))->getParameters() as $parameterReflection) {
+            $parameterType = $parameterReflection->getType();
+            if ($parameterType === null || $this->has($parameterType->__toString())) {
+                throw new UnresolvableException(sprintf('Parameter %s for %s::%s is not resolvable', $parameterType->getName(), $identifier, $methodName));
+            }
+
+            $params[] = $this->get($identifier);
+        }
+
+        return $identifier->{$methodName}(...$params);
     }
 
     public function addServiceProvider(ServiceProviderInterface $serviceProvider): void {

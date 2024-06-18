@@ -5,6 +5,8 @@ namespace PrinsFrank\Container\Definition\Item;
 
 use Closure;
 use Override;
+use PrinsFrank\Container\Container;
+use PrinsFrank\Container\Exception\ShouldNotHappenException;
 
 /**
  * @template T of object
@@ -26,9 +28,14 @@ final readonly class Singleton implements Definition {
     }
 
     #[Override]
-    public function get(): object {
+    public function get(Container $container): object {
         if (isset($this->instance) === false) {
-            $this->instance = $this->new->__invoke(); // @phpstan-ignore property.readOnlyAssignNotInConstructor
+            $resolved = $container->invoke($this->new);
+            if ($resolved instanceof $this->identifier === false) {
+                throw new ShouldNotHappenException();
+            }
+
+            $this->instance = $resolved; // @phpstan-ignore property.readOnlyAssignNotInConstructor
         }
 
         return $this->instance;
