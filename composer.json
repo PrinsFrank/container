@@ -27,10 +27,12 @@
     "scripts": {
         "cs": "php-cs-fixer fix --allow-risky=yes --dry-run",
         "cs:fix": "php-cs-fixer fix --allow-risky=yes",
-        "stan": "phpstan analyse --memory-limit 4G",
+        "stan": "phpstan analyse -v --memory-limit 4G",
         "unit": "phpunit --testsuite=Unit",
+        "integration": "phpunit --testsuite=Integration",
         "test": [
             "@unit",
+            "@integration",
             "@cs"
         ]
     },
