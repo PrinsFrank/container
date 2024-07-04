@@ -12,7 +12,6 @@ use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Tests\Fixtures\AbstractBImplementsInterfaceA;
 use PrinsFrank\Container\Tests\Fixtures\ConcreteCExtendsAbstractBImplementsInterfaceA;
 use PrinsFrank\Container\Tests\Fixtures\InterfaceA;
-use stdClass;
 
 class ConcreteTest extends TestCase {
     /** @throws InvalidArgumentException */
