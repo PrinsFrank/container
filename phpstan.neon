@@ -14,6 +14,7 @@ parameters:
             - 'PHPUnit\Framework\Exception'
             - 'PHPUnit\Event\Exception'
             - 'PHPUnit\Framework\MockObject\Exception'
+            - 'ReflectionException'
             - 'SebastianBergmann\RecursionContext\InvalidArgumentException'
             - 'PrinsFrank\Container\Exception\ShouldNotHappenException'
     treatPhpDocTypesAsCertain: false

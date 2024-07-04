@@ -8,19 +8,8 @@ use PrinsFrank\Container\Definition\Item\Definition;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 
 final class DefinitionSet {
-    /** @var list<Definition<object>> */
+    /** @var list<Definition<covariant object>> */
     private array $definitions = [];
-
-    /** @param class-string<object> $identifier */
-    public function has(string $identifier): bool {
-        foreach ($this->definitions as $definition) {
-            if ($definition->isFor($identifier) === true) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * @template T of object
@@ -28,19 +17,24 @@ final class DefinitionSet {
      * @throws ShouldNotHappenException
      * @return T
      */
-    public function get(string $identifier, Container $container): object {
+    public function get(string $identifier, Container $container): ?object {
         foreach ($this->definitions as $definition) {
             if ($definition->isFor($identifier) === false) {
                 continue;
             }
 
-            return $definition->get($container);
+            $item = $definition->get($container);
+            if (is_a($item, $identifier, true) === false) {
+                throw new ShouldNotHappenException(sprintf('The container returned an %s but expected to return a %s', gettype($item), $identifier));
+            }
+
+            return $item;
         }
 
-        throw new ShouldNotHappenException();
+        return null;
     }
 
-    /** @param Definition<object> $definition */
+    /** @param Definition<covariant object> $definition */
     public function add(Definition $definition): void {
         $this->definitions[] = $definition;
     }

@@ -7,7 +7,9 @@ use Closure;
 use Override;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
+use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
+use PrinsFrank\Container\Exception\UnresolvableException;
 
 /**
  * @template T of object
@@ -33,9 +35,10 @@ final readonly class Concrete implements Definition {
         return is_a($identifier, $this->identifier, true);
     }
 
+    /** @throws ShouldNotHappenException|UnresolvableException|InvalidServiceProviderException */
     #[Override]
     public function get(Container $container): object {
-        $resolved = $container->invoke($this->new);
+        $resolved = $this->new->__invoke(...$container->resolveParamsFor($this->new, '__invoke'));
         if ($resolved instanceof $this->identifier === false) {
             throw new ShouldNotHappenException(sprintf('Container returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
         }

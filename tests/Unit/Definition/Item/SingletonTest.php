@@ -6,7 +6,9 @@ use PHPUnit\Framework\TestCase;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Definition\Item\Singleton;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
+use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
+use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Tests\Fixtures\AbstractBImplementsInterfaceA;
 use PrinsFrank\Container\Tests\Fixtures\ConcreteCExtendsAbstractBImplementsInterfaceA;
 use PrinsFrank\Container\Tests\Fixtures\InterfaceA;
@@ -22,27 +24,14 @@ class SingletonTest extends TestCase {
         static::assertTrue($singleton->isFor(ConcreteCExtendsAbstractBImplementsInterfaceA::class));
     }
 
-    /** @throws InvalidArgumentException */
-    public function testGetThrowsExceptionOnInvalidReturnTypeContainer(): void {
-        $closureNew = fn () => new ConcreteCExtendsAbstractBImplementsInterfaceA();
-        $singleton = new Singleton(ConcreteCExtendsAbstractBImplementsInterfaceA::class, $closureNew);
-
-        $container = $this->createMock(Container::class);
-        $container->expects(self::once())->method('invoke')->with($closureNew)->willReturn(new stdClass());
-
-        $this->expectException(ShouldNotHappenException::class);
-        $this->expectExceptionMessage('Container returned type "object" instead of "' . ConcreteCExtendsAbstractBImplementsInterfaceA::class . '"');
-        $singleton->get($container);
-    }
-
-    /** @throws InvalidArgumentException */
+    /** @throws ShouldNotHappenException|UnresolvableException|InvalidServiceProviderException|InvalidArgumentException */
     public function testGetResolvesNewInstance(): void {
         $new = new ConcreteCExtendsAbstractBImplementsInterfaceA();
         $closureNew = fn () => $new;
         $singleton = new Singleton(ConcreteCExtendsAbstractBImplementsInterfaceA::class, $closureNew);
 
         $container = $this->createMock(Container::class);
-        $container->expects(self::once())->method('invoke')->with($closureNew)->willReturn($new);
+        $container->expects(self::once())->method('resolveParamsFor')->with($closureNew)->willReturn([]);
 
         static::assertSame($new, $singleton->get($container));
         static::assertSame($new, $singleton->get($container));

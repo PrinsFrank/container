@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace PrinsFrank\Container;
 
+use Closure;
 use Override;
-use PrinsFrank\Container\Exception\ContainerException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Definition\DefinitionSet;
 use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 class Container implements ContainerInterface {
     /** @var list<ServiceProviderInterface> */
@@ -21,16 +22,28 @@ class Container implements ContainerInterface {
         $this->resolvedSet = new DefinitionSet();
     }
 
+    public function addServiceProvider(ServiceProviderInterface $serviceProvider): void {
+        $this->serviceProvider[] = $serviceProvider;
+    }
+
+    public function addServiceProviders(ServiceProviderInterface... $serviceProviders): void {
+        foreach ($serviceProviders as $serviceProvider) {
+            $this->addServiceProvider($serviceProvider);
+        }
+    }
+
     /**
      * @template T of object
      * @param class-string<T> $id
-     * @throws ContainerException
+     * @throws UnresolvableException|InvalidServiceProviderException
      * @return T
+     *
+     * @phpstan-ignore method.childParameterType
      */
     #[Override]
     public function get(string $id): object {
-        if ($this->resolvedSet->has($id)) {
-            return $this->resolvedSet->get($id, $this);
+        if (($resolvedItem = $this->resolvedSet->get($id, $this)) !== null) {
+            return $resolvedItem;
         }
 
         foreach ($this->serviceProvider as $serviceProvider) {
@@ -39,20 +52,24 @@ class Container implements ContainerInterface {
             }
 
             $serviceProvider->register($this->resolvedSet);
-            if ($this->resolvedSet->has($id) === false) {
+            if (($resolvedItem = $this->resolvedSet->get($id, $this)) === null) {
                 throw new InvalidServiceProviderException($serviceProvider::class);
             }
 
-            return $this->resolvedSet->get($id, $this);
+            return $resolvedItem;
         }
 
         throw new UnresolvableException();
     }
 
-    /** @param class-string<object> $id */
+    /**
+     * @param class-string<object> $id
+     *
+     * @phpstan-ignore method.childParameterType
+     */
     #[Override]
     public function has(string $id): bool {
-        if ($this->resolvedSet->has($id)) {
+        if ($this->resolvedSet->get($id, $this) !== null) {
             return true;
         }
 
@@ -68,41 +85,29 @@ class Container implements ContainerInterface {
     /**
      * @template T of object
      * @param class-string<T> $identifier
+     * @throws UnresolvableException|InvalidServiceProviderException
      * @return T
      */
     public function construct(string $identifier): object {
-        return $this->call($identifier, '__construct');
-    }
-
-    public function invoke(callable|object $identifier): mixed {
-        return $this->call($identifier, '__invoke');
+        return new $identifier(...$this->resolveParamsFor($identifier, '__construct'));
     }
 
     /**
-     * @param class-string<object>|callable|object $identifier
-     * @throws UnresolvableException
+     * @param class-string<object>|Closure $identifier
+     * @throws InvalidServiceProviderException|UnresolvableException
+     * @return array<mixed>
      */
-    public function call(string|callable|object $identifier, string $methodName): mixed {
+    public function resolveParamsFor(string|Closure $identifier, string $methodName): array {
         $params = [];
-        foreach ((new ReflectionMethod($identifier, $methodName))->getParameters() as $parameterReflection) {
+        foreach ((new ReflectionMethod($identifier, $methodName))->getParameters() as $key => $parameterReflection) {
             $parameterType = $parameterReflection->getType();
-            if ($parameterType === null || $this->has($parameterType->__toString())) {
-                throw new UnresolvableException(sprintf('Parameter %s for %s::%s is not resolvable', $parameterType->getName(), $identifier, $methodName));
+            if ($parameterType instanceof ReflectionNamedType === false || (class_exists($parameterType->getName()) === false && interface_exists($parameterType->getName()) === false)) {
+                throw new UnresolvableException(sprintf('Parameter %s for %s::%s is not resolvable as it doesn\'t have a type specified', $key, $identifier instanceof Closure ? $identifier::class : $identifier, $methodName));
             }
 
-            $params[] = $this->get($identifier);
+            $params[] = $this->get($parameterType->getName());
         }
 
-        return $identifier->{$methodName}(...$params);
-    }
-
-    public function addServiceProvider(ServiceProviderInterface $serviceProvider): void {
-        $this->serviceProvider[] = $serviceProvider;
-    }
-
-    public function addServiceProviders(ServiceProviderInterface... $serviceProviders): void {
-        foreach ($serviceProviders as $serviceProvider) {
-            $this->addServiceProvider($serviceProvider);
-        }
+        return $params;
     }
 }

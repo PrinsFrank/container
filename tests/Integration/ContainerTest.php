@@ -13,6 +13,7 @@ use PrinsFrank\Container\Definition\Item\AbstractConcrete;
 use PrinsFrank\Container\Definition\Item\Concrete;
 use PrinsFrank\Container\Definition\Item\Singleton;
 use PrinsFrank\Container\Exception\ContainerException;
+use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
 
 class ContainerTest extends TestCase {
@@ -25,6 +26,7 @@ class ContainerTest extends TestCase {
                 return $identifier === DateTime::class;
             }
 
+            /** @throws ContainerException */
             #[Override]
             public function register(DefinitionSet $resolvedSet): void {
                 $resolvedSet->add(new Singleton(DateTime::class, fn () => new DateTime()));
@@ -87,5 +89,32 @@ class ContainerTest extends TestCase {
         static::assertInstanceOf(DateTime::class, $secondResolveResult);
         static::assertNotSame($firstResolveResult, $secondResolveResult);
         static::assertEquals($firstResolveResult, $secondResolveResult);
+    }
+
+    /** @throws ContainerException */
+    public function testCallHandlesResolvableType(): void {
+        $container = new Container();
+        $container->addServiceProvider(
+            new class ($now = new DateTime()) implements ServiceProviderInterface {
+                public function __construct(
+                    private readonly DateTime $now,
+                ) {
+                }
+
+                #[Override]
+                public function provides(string $identifier): bool {
+                    return $identifier === DateTimeInterface::class;
+                }
+
+                /** @throws InvalidArgumentException */
+                #[Override]
+                public function register(DefinitionSet $resolvedSet): void {
+                    $resolvedSet->add(new AbstractConcrete(DateTimeInterface::class, fn () => $this->now));
+                }
+            }
+        );
+
+        $closure = fn (DateTimeInterface $foo) => $foo;
+        static::assertSame([$now], $container->resolveParamsFor($closure, '__invoke'));
     }
 }
