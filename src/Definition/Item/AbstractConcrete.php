@@ -8,11 +8,17 @@ use Override;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
-use PrinsFrank\Container\Exception\UnresolvableException;
 
-/** @implements Definition<object> */
+/**
+ * @template T of object
+ * @implements Definition<T>
+ */
 final readonly class AbstractConcrete implements Definition {
-    /** @throws InvalidArgumentException */
+    /**
+     * @param class-string<T> $identifier
+     * @param Closure(): T $new
+     * @throws InvalidArgumentException
+     */
     public function __construct(
         private string  $identifier,
         private Closure $new,
@@ -24,18 +30,15 @@ final readonly class AbstractConcrete implements Definition {
 
     #[Override]
     public function isFor(string $identifier): bool {
-        return is_a($this->identifier, $identifier, true);
+        return $identifier === $this->identifier;
     }
 
-    /**
-     * @throws UnresolvableException
-     * @throws ShouldNotHappenException
-     */
+    /** @throws ShouldNotHappenException */
     #[Override]
     public function get(Container $container): object {
         $resolved = $container->invoke($this->new);
         if ($resolved instanceof $this->identifier === false) {
-            throw new ShouldNotHappenException();
+            throw new ShouldNotHappenException(sprintf('Container returned type "%s" instead of concrete for "%s"', gettype($resolved), $this->identifier));
         }
 
         return $resolved;

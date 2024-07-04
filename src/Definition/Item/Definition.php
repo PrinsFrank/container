@@ -7,7 +7,6 @@ use PrinsFrank\Container\Container;
 
 /** @template T of object */
 interface Definition {
-    /** @phpstan-assert-if-true class-string<T> $identifier */
     public function isFor(string $identifier): bool;
 
     /** @return T */

@@ -12,7 +12,10 @@ parameters:
         implicitThrows: false
         uncheckedExceptionClasses:
             - 'PHPUnit\Framework\Exception'
+            - 'PHPUnit\Event\Exception'
+            - 'PHPUnit\Framework\MockObject\Exception'
             - 'SebastianBergmann\RecursionContext\InvalidArgumentException'
+            - 'PrinsFrank\Container\Exception\ShouldNotHappenException'
     treatPhpDocTypesAsCertain: false
     checkBenevolentUnionTypes: true
     reportPossiblyNonexistentGeneralArrayOffset: true

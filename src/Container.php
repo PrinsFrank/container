@@ -12,7 +12,7 @@ use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionMethod;
 
-final class Container implements ContainerInterface {
+class Container implements ContainerInterface {
     /** @var list<ServiceProviderInterface> */
     private array $serviceProvider = [];
     private readonly DefinitionSet $resolvedSet;
@@ -67,7 +67,7 @@ final class Container implements ContainerInterface {
 
     /**
      * @template T of object
-     * @param class-string<T>
+     * @param class-string<T> $identifier
      * @return T
      */
     public function construct(string $identifier): object {
