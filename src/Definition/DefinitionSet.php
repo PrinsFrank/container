@@ -6,12 +6,13 @@ namespace PrinsFrank\Container\Definition;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Definition\Item\Definition;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
+use PrinsFrank\Container\Resolver\ParameterResolver;
 
 final class DefinitionSet {
     /** @var list<Definition<covariant object>> */
     private array $definitions = [];
 
-    public function __construct(public readonly Container $forContainer) {
+    public function __construct(public readonly Container $forContainer, public readonly ParameterResolver $parameterResolver) {
     }
 
     /**
@@ -26,7 +27,7 @@ final class DefinitionSet {
                 continue;
             }
 
-            $item = $definition->get($container);
+            $item = $definition->get($container, $this->parameterResolver);
             if (is_a($item, $identifier, true) === false) {
                 throw new ShouldNotHappenException(sprintf('The container returned an %s but expected to return a %s', gettype($item), $identifier));
             }

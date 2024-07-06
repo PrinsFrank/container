@@ -90,31 +90,4 @@ class ContainerTest extends TestCase {
         static::assertNotSame($firstResolveResult, $secondResolveResult);
         static::assertEquals($firstResolveResult, $secondResolveResult);
     }
-
-    /** @throws ContainerException */
-    public function testCallHandlesResolvableType(): void {
-        $container = new Container();
-        $container->addServiceProvider(
-            new class ($now = new DateTime()) implements ServiceProviderInterface {
-                public function __construct(
-                    private readonly DateTime $now,
-                ) {
-                }
-
-                #[Override]
-                public function provides(string $identifier): bool {
-                    return $identifier === DateTimeInterface::class;
-                }
-
-                /** @throws InvalidArgumentException */
-                #[Override]
-                public function register(DefinitionSet $resolvedSet): void {
-                    $resolvedSet->add(new AbstractConcrete(DateTimeInterface::class, fn () => $this->now));
-                }
-            }
-        );
-
-        $closure = fn (DateTimeInterface $foo) => $foo;
-        static::assertSame([$now], $container->resolveParamsFor($closure, '__invoke'));
-    }
 }

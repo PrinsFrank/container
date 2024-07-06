@@ -10,6 +10,7 @@ use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 use PrinsFrank\Container\Exception\UnresolvableException;
+use PrinsFrank\Container\Resolver\ParameterResolver;
 use ReflectionClass;
 
 /**
@@ -41,9 +42,9 @@ final readonly class Singleton implements Definition {
 
     /** @throws ShouldNotHappenException|UnresolvableException|InvalidServiceProviderException */
     #[Override]
-    public function get(Container $container): object {
+    public function get(Container $container, ParameterResolver $parameterResolver): object {
         if (isset($this->instance) === false) {
-            $resolved = $this->new->__invoke(...$container->resolveParamsFor($this->new, '__invoke'));
+            $resolved = $this->new->__invoke(...$parameterResolver->resolveParamsFor($this->new, '__invoke'));
             if ($resolved instanceof $this->identifier === false) {
                 throw new ShouldNotHappenException(sprintf('Container returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
             }

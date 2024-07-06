@@ -10,6 +10,7 @@ use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 use PrinsFrank\Container\Exception\UnresolvableException;
+use PrinsFrank\Container\Resolver\ParameterResolver;
 use ReflectionClass;
 
 /**
@@ -38,8 +39,8 @@ final readonly class AbstractConcrete implements Definition {
 
     /** @throws ShouldNotHappenException|UnresolvableException|InvalidServiceProviderException */
     #[Override]
-    public function get(Container $container): object {
-        $resolved = $this->new->__invoke(...$container->resolveParamsFor($this->new, '__invoke'));
+    public function get(Container $container, ParameterResolver $parameterResolver): object {
+        $resolved = $this->new->__invoke(...$parameterResolver->resolveParamsFor($this->new, '__invoke'));
         if ($resolved instanceof $this->identifier === false) {
             throw new ShouldNotHappenException(sprintf('Container returned type "%s" instead of concrete for "%s"', gettype($resolved), $this->identifier));
         }
