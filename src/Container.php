@@ -19,8 +19,11 @@ class Container implements ContainerInterface {
     private array $serviceProvider = [];
     private readonly DefinitionSet $resolvedSet;
 
-    public function __construct() {
+    public function __construct(bool $allowContainerToResolveItself = true) {
         $this->resolvedSet = new DefinitionSet();
+        if ($allowContainerToResolveItself === true) {
+            $this->resolvedSet->add(new Singleton(Container::class, fn () => $this));
+        }
     }
 
     public function addServiceProvider(ServiceProviderInterface $serviceProvider): void {
