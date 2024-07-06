@@ -42,7 +42,7 @@ final readonly class AbstractConcrete implements Definition {
     #[Override]
     public function get(Container $container, ParameterResolver $parameterResolver): object {
         $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));
-        if ($resolved !== null && $resolved instanceof $this->identifier === false) {
+        if ($resolved instanceof $this->identifier === false) {
             throw new ShouldNotHappenException(sprintf('Closure returned type "%s" instead of concrete for "%s"', gettype($resolved), $this->identifier));
         }
 
