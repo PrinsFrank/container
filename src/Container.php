@@ -5,6 +5,7 @@ namespace PrinsFrank\Container;
 
 use Closure;
 use Override;
+use PrinsFrank\Container\Definition\Item\Singleton;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Definition\DefinitionSet;
@@ -59,7 +60,7 @@ class Container implements ContainerInterface {
             return $resolvedItem;
         }
 
-        throw new UnresolvableException();
+        throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));
     }
 
     /**
