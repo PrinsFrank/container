@@ -35,7 +35,7 @@ class ParameterResolver {
                 throw new UnresolvableException(sprintf('Parameter %s for %s::%s is not resolvable as it doesn\'t have a type specified', $key, $identifier, $methodName));
             }
 
-            $params[] = $this->container->get($parameterType->getName());
+            $params[] = $this->optionallyResolve($parameterType->getName(), $parameterType->allowsNull());
         }
 
         return $params;
@@ -53,9 +53,27 @@ class ParameterResolver {
                 throw new UnresolvableException(sprintf('Parameter %s for closure at %s::%s is not resolvable as it doesn\'t have a type specified', $key, $reflectionFunction->getFileName(), $reflectionFunction->getStartLine()));
             }
 
-            $params[] = $this->container->get($parameterType->getName());
+            $params[] = $this->optionallyResolve($parameterType->getName(), $parameterType->allowsNull());
         }
 
         return $params;
+    }
+
+    /**
+     * @template T of object
+     * @param class-string<T> $identifier
+     * @return T|null
+     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException
+     */
+    private function optionallyResolve(string $identifier, bool $allowsNull): ?object {
+        if ($allowsNull === false) {
+            return $this->container->get($identifier);
+        }
+
+        try {
+            return $this->container->get($identifier);
+        } catch (UnresolvableException $e) {
+            return null;
+        }
     }
 }
