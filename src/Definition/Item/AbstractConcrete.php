@@ -10,6 +10,7 @@ use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 use PrinsFrank\Container\Exception\UnresolvableException;
+use ReflectionClass;
 
 /**
  * @template T of object
@@ -25,8 +26,8 @@ final readonly class AbstractConcrete implements Definition {
         private string  $identifier,
         private Closure $new,
     ) {
-        if (interface_exists($this->identifier) === false) {
-            throw new InvalidArgumentException('Argument $identifier is expected to be a class-string for an interface');
+        if (interface_exists($this->identifier) === false || class_exists($this->identifier) === false || (new ReflectionClass($this->identifier))->isAbstract() === false) {
+            throw new InvalidArgumentException('Argument $identifier is expected to be a class-string for an interface or abstract class');
         }
     }
 

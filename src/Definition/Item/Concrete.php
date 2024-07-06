@@ -10,6 +10,7 @@ use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 use PrinsFrank\Container\Exception\UnresolvableException;
+use ReflectionClass;
 
 /**
  * @template T of object
@@ -25,7 +26,7 @@ final readonly class Concrete implements Definition {
         private string  $identifier,
         private Closure $new,
     ) {
-        if (class_exists($this->identifier) === false || interface_exists($this->identifier) === true) {
+        if (class_exists($this->identifier) === false || interface_exists($this->identifier) === true || (new ReflectionClass($this->identifier))->isAbstract()) {
             throw new InvalidArgumentException('Argument $identifier is expected to be a class-string for a concrete class');
         }
     }
