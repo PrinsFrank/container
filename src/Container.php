@@ -5,10 +5,10 @@ namespace PrinsFrank\Container;
 
 use Closure;
 use Override;
-use PrinsFrank\Container\Definition\Item\Singleton;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Definition\DefinitionSet;
+use PrinsFrank\Container\ServiceProvider\ContainerProvider;
 use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionMethod;
@@ -19,10 +19,10 @@ class Container implements ContainerInterface {
     private array $serviceProvider = [];
     private readonly DefinitionSet $resolvedSet;
 
-    public function __construct(bool $allowContainerToResolveItself = true) {
-        $this->resolvedSet = new DefinitionSet();
-        if ($allowContainerToResolveItself === true) {
-            $this->resolvedSet->add(new Singleton(Container::class, fn () => $this));
+    public function __construct(bool $allowSelfResolve = true) {
+        $this->resolvedSet = new DefinitionSet($this);
+        if ($allowSelfResolve === true) {
+            $this->addServiceProvider(new ContainerProvider());
         }
     }
 

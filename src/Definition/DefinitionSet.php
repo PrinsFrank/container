@@ -11,6 +11,9 @@ final class DefinitionSet {
     /** @var list<Definition<covariant object>> */
     private array $definitions = [];
 
+    public function __construct(public readonly Container $forContainer) {
+    }
+
     /**
      * @template T of object
      * @param class-string<T> $identifier
