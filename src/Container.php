@@ -19,7 +19,7 @@ class Container implements ContainerInterface {
     private array $serviceProvider = [];
     private readonly DefinitionSet $resolvedSet;
 
-    public function __construct(bool $allowSelfResolve = true) {
+    public function __construct(bool $allowSelfResolve = true, private readonly bool $autowire = true) {
         $this->resolvedSet = new DefinitionSet($this);
         if ($allowSelfResolve === true) {
             $this->addServiceProvider(new ContainerProvider());
@@ -63,6 +63,10 @@ class Container implements ContainerInterface {
             return $resolvedItem;
         }
 
+        if ($this->autowire === true) {
+            return $this->construct($id);
+        }
+
         throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));
     }
 
@@ -81,6 +85,10 @@ class Container implements ContainerInterface {
             if ($serviceProvider->provides($id)) {
                 return true;
             }
+        }
+
+        if ($this->autowire === true) {
+            return true;
         }
 
         return false;
