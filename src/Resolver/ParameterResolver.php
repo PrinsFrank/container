@@ -4,6 +4,7 @@ namespace PrinsFrank\Container\Resolver;
 
 use Closure;
 use PrinsFrank\Container\Container;
+use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use ReflectionMethod;
@@ -17,10 +18,15 @@ class ParameterResolver {
 
     /**
      * @param class-string<object>|Closure $identifier
-     * @throws InvalidServiceProviderException|UnresolvableException
+     * @param non-empty-string $methodName
      * @return array<mixed>
+     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException
      */
     public function resolveParamsFor(string|Closure $identifier, string $methodName): array {
+        if (method_exists($methodName, $identifier instanceof Closure ? $identifier::class : $identifier) === false) {
+            throw new InvalidMethodException(sprintf('Method "%s" does not exist on "%s"', $methodName, $identifier instanceof Closure ? $identifier::class : $identifier));
+        }
+
         $params = [];
         foreach ((new ReflectionMethod($identifier, $methodName))->getParameters() as $key => $parameterReflection) {
             $parameterType = $parameterReflection->getType();

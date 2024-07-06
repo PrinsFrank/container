@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace PrinsFrank\Container;
 
 use Override;
+use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Definition\DefinitionSet;
@@ -27,7 +28,7 @@ class Container implements ContainerInterface {
     /**
      * @template T of object
      * @param class-string<T> $id
-     * @throws UnresolvableException|InvalidServiceProviderException
+     * @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException
      * @return T
      *
      * @phpstan-ignore method.childParameterType
@@ -52,7 +53,7 @@ class Container implements ContainerInterface {
         }
 
         if ($this->autowire === true) {
-            return new $id(...$this->resolvedSet->parameterResolver->resolveParamsFor($id, '__construct'));
+            return method_exists($id, '__construct') === false ? new $id : new $id(...$this->resolvedSet->parameterResolver->resolveParamsFor($id, '__construct'));
         }
 
         throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));
