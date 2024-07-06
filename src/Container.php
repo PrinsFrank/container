@@ -46,6 +46,9 @@ class Container implements ContainerInterface {
             }
 
             $serviceProvider->register($this->resolvedSet);
+            if ($this->resolvedSet->has($id) === false) {
+                throw new InvalidServiceProviderException(sprintf('Provider "%s" said it would provide "%s" but after registering it is not resolvable', $serviceProvider::class, $id));
+            }
 
             return $this->resolvedSet->get($id, $this);
         }
