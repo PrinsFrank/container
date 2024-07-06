@@ -41,7 +41,7 @@ final readonly class AbstractConcrete implements Definition {
     /** @throws ShouldNotHappenException|UnresolvableException|InvalidServiceProviderException|InvalidMethodException */
     #[Override]
     public function get(Container $container, ParameterResolver $parameterResolver): object {
-        $resolved = $this->new->__invoke(...$parameterResolver->resolveParamsFor($this->new, '__invoke'));
+        $resolved = $this->new->__invoke(...$parameterResolver->resolveParamsForClosure($this->new));
         if ($resolved instanceof $this->identifier === false) {
             throw new ShouldNotHappenException(sprintf('Container returned type "%s" instead of concrete for "%s"', gettype($resolved), $this->identifier));
         }

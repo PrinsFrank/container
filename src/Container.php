@@ -53,7 +53,7 @@ class Container implements ContainerInterface {
         }
 
         if ($this->autowire === true) {
-            return method_exists($id, '__construct') === false ? new $id : new $id(...$this->resolvedSet->parameterResolver->resolveParamsFor($id, '__construct'));
+            return method_exists($id, '__construct') === false ? new $id : new $id(...$this->resolvedSet->parameterResolver->resolveParamsForMethod($id, '__construct'));
         }
 
         throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));

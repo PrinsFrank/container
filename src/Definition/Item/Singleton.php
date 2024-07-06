@@ -45,7 +45,7 @@ final readonly class Singleton implements Definition {
     #[Override]
     public function get(Container $container, ParameterResolver $parameterResolver): object {
         if (isset($this->instance) === false) {
-            $resolved = $this->new->__invoke(...$parameterResolver->resolveParamsFor($this->new, '__invoke'));
+            $resolved = $this->new->__invoke(...$parameterResolver->resolveParamsForClosure($this->new));
             if ($resolved instanceof $this->identifier === false) {
                 throw new ShouldNotHappenException(sprintf('Container returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
             }
