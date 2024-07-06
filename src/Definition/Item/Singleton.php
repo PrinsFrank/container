@@ -9,7 +9,7 @@ use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
-use PrinsFrank\Container\Exception\ShouldNotHappenException;
+use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Resolver\ParameterResolver;
 use ReflectionClass;
@@ -19,12 +19,12 @@ use ReflectionClass;
  * @implements Definition<T>
  */
 final readonly class Singleton implements Definition {
-    /** @var T */
-    private object $instance; // @phpstan-ignore property.uninitializedReadonly
+    /** @var T|null */
+    private ?object $instance; // @phpstan-ignore property.uninitializedReadonly
 
     /**
      * @param class-string<T> $identifier
-     * @param Closure(): T $new
+     * @param Closure(): T|Closure(): null $new
      * @throws InvalidArgumentException
      */
     public function __construct(
@@ -41,13 +41,13 @@ final readonly class Singleton implements Definition {
         return $identifier === $this->identifier;
     }
 
-    /** @throws ShouldNotHappenException|UnresolvableException|InvalidServiceProviderException|InvalidMethodException */
+    /** @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException|MissingDefinitionException */
     #[Override]
-    public function get(Container $container, ParameterResolver $parameterResolver): object {
+    public function get(Container $container, ParameterResolver $parameterResolver): ?object {
         if (isset($this->instance) === false) {
             $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));
-            if ($resolved instanceof $this->identifier === false) {
-                throw new ShouldNotHappenException(sprintf('Closure returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
+            if ($resolved !== null && $resolved instanceof $this->identifier === false) {
+                throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
             }
 
             $this->instance = $resolved; // @phpstan-ignore property.readOnlyAssignNotInConstructor

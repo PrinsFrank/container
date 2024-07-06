@@ -5,6 +5,7 @@ namespace PrinsFrank\Container\Definition;
 
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Definition\Item\Definition;
+use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 use PrinsFrank\Container\Resolver\ParameterResolver;
 
@@ -18,8 +19,22 @@ final class DefinitionSet {
     /**
      * @template T of object
      * @param class-string<T> $identifier
-     * @throws ShouldNotHappenException
-     * @return T
+     */
+    public function has(string $identifier): bool {
+        foreach ($this->definitions as $definition) {
+            if ($definition->isFor($identifier)) {
+                return true;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @template T of object
+     * @param class-string<T> $identifier
+     * @throws MissingDefinitionException|ShouldNotHappenException
+     * @return T|null
      */
     public function get(string $identifier, Container $container): ?object {
         foreach ($this->definitions as $definition) {
@@ -28,14 +43,14 @@ final class DefinitionSet {
             }
 
             $item = $definition->get($container, $this->parameterResolver);
-            if (is_a($item, $identifier, true) === false) {
+            if ($item !== null && is_a($item, $identifier, true) === false) {
                 throw new ShouldNotHappenException(sprintf('The container returned an %s but expected to return a %s', gettype($item), $identifier));
             }
 
             return $item;
         }
 
-        return null;
+        throw new MissingDefinitionException($identifier);
     }
 
     /** @param Definition<covariant object> $definition */

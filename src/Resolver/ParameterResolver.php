@@ -6,6 +6,7 @@ use Closure;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
+use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -20,8 +21,8 @@ class ParameterResolver {
     /**
      * @param class-string<object> $identifier
      * @param non-empty-string $methodName
+     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return array<mixed>
-     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException
      */
     public function resolveParamsForMethod(string $identifier, string $methodName): array {
         if (method_exists($identifier, $methodName) === false) {
@@ -42,8 +43,8 @@ class ParameterResolver {
     }
 
     /**
+     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return array<mixed>
-     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException
      */
     public function resolveParamsForClosure(Closure $closure): array {
         $params = [];
@@ -62,8 +63,8 @@ class ParameterResolver {
     /**
      * @template T of object
      * @param class-string<T> $identifier
+     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return T|null
-     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException
      */
     private function optionallyResolve(string $identifier, bool $allowsNull): ?object {
         if ($allowsNull === false) {

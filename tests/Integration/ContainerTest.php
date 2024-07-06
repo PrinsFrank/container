@@ -13,7 +13,6 @@ use PrinsFrank\Container\Definition\Item\AbstractConcrete;
 use PrinsFrank\Container\Definition\Item\Concrete;
 use PrinsFrank\Container\Definition\Item\Singleton;
 use PrinsFrank\Container\Exception\ContainerException;
-use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
 
 class ContainerTest extends TestCase {

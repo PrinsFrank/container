@@ -10,6 +10,6 @@ use PrinsFrank\Container\Resolver\ParameterResolver;
 interface Definition {
     public function isFor(string $identifier): bool;
 
-    /** @return T */
-    public function get(Container $container, ParameterResolver $parameterResolver): object;
+    /** @return T|null */
+    public function get(Container $container, ParameterResolver $parameterResolver): ?object;
 }

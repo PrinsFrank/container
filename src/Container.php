@@ -6,6 +6,7 @@ namespace PrinsFrank\Container;
 use Override;
 use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
+use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Definition\DefinitionSet;
 use PrinsFrank\Container\Resolver\ParameterResolver;
@@ -28,15 +29,15 @@ class Container implements ContainerInterface {
     /**
      * @template T of object
      * @param class-string<T> $id
-     * @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException
-     * @return T
+     * @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException|MissingDefinitionException
+     * @return T|null
      *
      * @phpstan-ignore method.childParameterType
      */
     #[Override]
-    public function get(string $id): object {
-        if (($resolvedItem = $this->resolvedSet->get($id, $this)) !== null) {
-            return $resolvedItem;
+    public function get(string $id): ?object {
+        if ($this->resolvedSet->has($id)) {
+            return $this->resolvedSet->get($id, $this);
         }
 
         foreach ($this->serviceProvider as $serviceProvider) {
@@ -45,15 +46,12 @@ class Container implements ContainerInterface {
             }
 
             $serviceProvider->register($this->resolvedSet);
-            if (($resolvedItem = $this->resolvedSet->get($id, $this)) === null) {
-                throw new InvalidServiceProviderException($serviceProvider::class);
-            }
 
-            return $resolvedItem;
+            return $this->resolvedSet->get($id, $this);
         }
 
         if ($this->autowire === true) {
-            return method_exists($id, '__construct') === false ? new $id : new $id(...$this->resolvedSet->parameterResolver->resolveParamsForMethod($id, '__construct'));
+            return method_exists($id, '__construct') === false ? new $id() : new $id(...$this->resolvedSet->parameterResolver->resolveParamsForMethod($id, '__construct'));
         }
 
         throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));
@@ -70,7 +68,7 @@ class Container implements ContainerInterface {
             return true;
         }
 
-        if ($this->resolvedSet->get($id, $this) !== null) {
+        if ($this->resolvedSet->has($id)) {
             return true;
         }
 
