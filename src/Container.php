@@ -26,16 +26,6 @@ class Container implements ContainerInterface {
         }
     }
 
-    public function addServiceProvider(ServiceProviderInterface $serviceProvider): void {
-        $this->serviceProvider[] = $serviceProvider;
-    }
-
-    public function addServiceProviders(ServiceProviderInterface... $serviceProviders): void {
-        foreach ($serviceProviders as $serviceProvider) {
-            $this->addServiceProvider($serviceProvider);
-        }
-    }
-
     /**
      * @template T of object
      * @param class-string<T> $id
@@ -64,7 +54,7 @@ class Container implements ContainerInterface {
         }
 
         if ($this->autowire === true) {
-            return $this->construct($id);
+            return new $id(...$this->resolveParamsFor($id, '__construct'));
         }
 
         throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));
@@ -94,14 +84,14 @@ class Container implements ContainerInterface {
         return false;
     }
 
-    /**
-     * @template T of object
-     * @param class-string<T> $identifier
-     * @throws UnresolvableException|InvalidServiceProviderException
-     * @return T
-     */
-    public function construct(string $identifier): object {
-        return new $identifier(...$this->resolveParamsFor($identifier, '__construct'));
+    public function addServiceProvider(ServiceProviderInterface $serviceProvider): void {
+        $this->serviceProvider[] = $serviceProvider;
+    }
+
+    public function addServiceProviders(ServiceProviderInterface... $serviceProviders): void {
+        foreach ($serviceProviders as $serviceProvider) {
+            $this->addServiceProvider($serviceProvider);
+        }
     }
 
     /**
