@@ -67,6 +67,10 @@ class Container implements ContainerInterface {
      */
     #[Override]
     public function has(string $id): bool {
+        if ($this->autowire === true) {
+            return true;
+        }
+
         if ($this->resolvedSet->get($id, $this) !== null) {
             return true;
         }
@@ -75,10 +79,6 @@ class Container implements ContainerInterface {
             if ($serviceProvider->provides($id)) {
                 return true;
             }
-        }
-
-        if ($this->autowire === true) {
-            return true;
         }
 
         return false;
