@@ -26,7 +26,7 @@ final readonly class AbstractConcrete implements Definition {
         private string  $identifier,
         private Closure $new,
     ) {
-        if (interface_exists($this->identifier) === false || class_exists($this->identifier) === false || (new ReflectionClass($this->identifier))->isAbstract() === false) {
+        if (interface_exists($this->identifier) === false && (class_exists($this->identifier) !== false && (new ReflectionClass($this->identifier))->isAbstract() === false)) {
             throw new InvalidArgumentException('Argument $identifier is expected to be a class-string for an interface or abstract class');
         }
     }
