@@ -45,9 +45,9 @@ final readonly class Singleton implements Definition {
     #[Override]
     public function get(Container $container, ParameterResolver $parameterResolver): object {
         if (isset($this->instance) === false) {
-            $resolved = $this->new->__invoke(...$parameterResolver->resolveParamsForClosure($this->new));
-            if ($resolved instanceof $this->identifier === false) {
-                throw new ShouldNotHappenException(sprintf('Container returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
+            $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));
+            if ($resolved !== null && $resolved instanceof $this->identifier === false) {
+                throw new ShouldNotHappenException(sprintf('Closure returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
             }
 
             $this->instance = $resolved; // @phpstan-ignore property.readOnlyAssignNotInConstructor
