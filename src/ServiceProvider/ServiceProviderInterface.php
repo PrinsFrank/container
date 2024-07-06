@@ -9,5 +9,5 @@ interface ServiceProviderInterface {
     /** @param class-string<object> $identifier */
     public function provides(string $identifier): bool;
 
-    public function register(DefinitionSet $resolvedSet): void;
+    public function register(string $identifier, DefinitionSet $resolvedSet): void;
 }

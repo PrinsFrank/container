@@ -16,7 +16,7 @@ class ContainerProvider implements ServiceProviderInterface {
 
     /** @throws InvalidArgumentException */
     #[Override]
-    public function register(DefinitionSet $resolvedSet): void {
+    public function register(string $identifier, DefinitionSet $resolvedSet): void {
         $resolvedSet->add(
             new Singleton(
                 Container::class,

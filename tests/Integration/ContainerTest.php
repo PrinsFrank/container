@@ -27,7 +27,7 @@ class ContainerTest extends TestCase {
 
             /** @throws ContainerException */
             #[Override]
-            public function register(DefinitionSet $resolvedSet): void {
+            public function register(string $identifier, DefinitionSet $resolvedSet): void {
                 $resolvedSet->add(new Singleton(DateTime::class, fn () => new DateTime()));
             }
         });
@@ -51,7 +51,7 @@ class ContainerTest extends TestCase {
 
             /** @throws ContainerException */
             #[Override]
-            public function register(DefinitionSet $resolvedSet): void {
+            public function register(string $identifier, DefinitionSet $resolvedSet): void {
                 $resolvedSet->add(new AbstractConcrete(DateTimeInterface::class, fn () => new DateTime('2001-01-01 01:01:01')));
             }
         });
@@ -76,7 +76,7 @@ class ContainerTest extends TestCase {
 
             /** @throws ContainerException */
             #[Override]
-            public function register(DefinitionSet $resolvedSet): void {
+            public function register(string $identifier, DefinitionSet $resolvedSet): void {
                 $resolvedSet->add(new Concrete(DateTime::class, fn () => new DateTime('2001-01-01 01:01:01')));
             }
         });
