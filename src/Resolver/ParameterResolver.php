@@ -24,7 +24,7 @@ class ParameterResolver {
      * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException
      */
     public function resolveParamsForMethod(string $identifier, string $methodName): array {
-        if (method_exists($methodName, $identifier) === false) {
+        if (method_exists($identifier, $methodName) === false) {
             throw new InvalidMethodException(sprintf('Method "%s" does not exist on "%s"', $methodName, $identifier));
         }
 
