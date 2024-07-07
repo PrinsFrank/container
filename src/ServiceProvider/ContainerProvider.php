@@ -8,7 +8,7 @@ use PrinsFrank\Container\Definition\DefinitionSet;
 use PrinsFrank\Container\Definition\Item\Singleton;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
 
-class ContainerProvider implements ServiceProviderInterface {
+final class ContainerProvider implements ServiceProviderInterface {
     #[Override]
     public function provides(string $identifier): bool {
         return $identifier === Container::class;

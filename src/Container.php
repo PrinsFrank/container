@@ -14,7 +14,7 @@ use PrinsFrank\Container\ServiceProvider\ContainerProvider;
 use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
 
-class Container implements ContainerInterface {
+final class Container implements ContainerInterface {
     /** @var list<ServiceProviderInterface> */
     private array $serviceProvider = [];
     private readonly DefinitionSet $resolvedSet;

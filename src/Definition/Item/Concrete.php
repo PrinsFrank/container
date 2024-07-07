@@ -13,12 +13,13 @@ use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Resolver\ParameterResolver;
 use ReflectionClass;
+use stdClass;
 
 /**
  * @template T of object
  * @implements Definition<T>
  */
-final readonly class Concrete implements Definition {
+readonly class Concrete implements Definition {
     /**
      * @param class-string<T> $identifier
      * @param Closure(): T|Closure(): null $new
@@ -43,7 +44,7 @@ final readonly class Concrete implements Definition {
     public function get(Container $container, ParameterResolver $parameterResolver): ?object {
         $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));
         if ($resolved !== null && $resolved instanceof $this->identifier === false) {
-            throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
+            throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', $resolved instanceof stdClass ? get_class($resolved) : gettype($resolved), $this->identifier));
         }
 
         return $resolved;

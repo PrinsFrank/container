@@ -12,7 +12,7 @@ use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionNamedType;
 
-class ParameterResolver {
+final class ParameterResolver {
     public function __construct(
         private readonly Container $container,
     ) {

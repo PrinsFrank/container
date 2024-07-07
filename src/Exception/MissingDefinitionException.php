@@ -2,5 +2,5 @@
 
 namespace PrinsFrank\Container\Exception;
 
-class MissingDefinitionException extends ContainerException {
+final class MissingDefinitionException extends ContainerException {
 }

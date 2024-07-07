@@ -13,12 +13,13 @@ use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\Resolver\ParameterResolver;
 use ReflectionClass;
+use stdClass;
 
 /**
  * @template T of object
  * @implements Definition<T>
  */
-final readonly class Singleton implements Definition {
+readonly class Singleton implements Definition {
     /** @var T|null */
     private ?object $instance; // @phpstan-ignore property.uninitializedReadonly
 
@@ -47,7 +48,7 @@ final readonly class Singleton implements Definition {
         if (isset($this->instance) === false) {
             $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));
             if ($resolved !== null && $resolved instanceof $this->identifier === false) {
-                throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', gettype($resolved), $this->identifier));
+                throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', $resolved instanceof stdClass ? get_class($resolved) : gettype($resolved), $this->identifier));
             }
 
             $this->instance = $resolved; // @phpstan-ignore property.readOnlyAssignNotInConstructor

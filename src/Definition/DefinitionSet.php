@@ -9,7 +9,7 @@ use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
 use PrinsFrank\Container\Resolver\ParameterResolver;
 
-final class DefinitionSet {
+class DefinitionSet {
     /** @var list<Definition<covariant object>> */
     private array $definitions = [];
 
