@@ -19,15 +19,15 @@ use stdClass;
  * @template T of object
  * @implements Definition<T>
  */
-readonly class AbstractConcrete implements Definition {
+class AbstractConcrete implements Definition {
     /**
      * @param class-string<T> $identifier
      * @param Closure(): T|Closure(): null $new
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private string  $identifier,
-        private Closure $new,
+        readonly private string  $identifier,
+        readonly private Closure $new,
     ) {
         if (interface_exists($this->identifier) === false && (class_exists($this->identifier) === false || (new ReflectionClass($this->identifier))->isAbstract() === false)) {
             throw new InvalidArgumentException('Argument $identifier is expected to be a class-string for an interface or abstract class');
