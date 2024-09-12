@@ -19,9 +19,9 @@ use stdClass;
  * @template T of object
  * @implements Definition<T>
  */
-readonly class Singleton implements Definition {
+class Singleton implements Definition {
     /** @var T|null */
-    private ?object $instance; // @phpstan-ignore property.uninitializedReadonly
+    private ?object $instance;
 
     /**
      * @param class-string<T> $identifier
@@ -29,8 +29,8 @@ readonly class Singleton implements Definition {
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private string  $identifier,
-        private Closure $new,
+        readonly private string  $identifier,
+        readonly private Closure $new,
     ) {
         if (class_exists($this->identifier) === false || interface_exists($this->identifier) === true || (new ReflectionClass($this->identifier))->isAbstract()) {
             throw new InvalidArgumentException('Argument $identifier is expected to be a class-string for a concrete class');
@@ -51,7 +51,7 @@ readonly class Singleton implements Definition {
                 throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', $resolved instanceof stdClass ? get_class($resolved) : gettype($resolved), $this->identifier));
             }
 
-            $this->instance = $resolved; // @phpstan-ignore property.readOnlyAssignNotInConstructor
+            $this->instance = $resolved;
         }
 
         return $this->instance;

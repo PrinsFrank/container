@@ -4,7 +4,7 @@ parameters:
     paths:
         - src
         - tests
-    phpVersion: 80300 # Lowest currently supported version
+    phpVersion: 80100 # Lowest currently supported version
     exceptions:
         check:
             missingCheckedExceptionInThrows: true
