@@ -31,8 +31,6 @@ final class Container implements ContainerInterface {
      * @param class-string<T> $id
      * @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException|MissingDefinitionException
      * @return T|null
-     *
-     * @phpstan-ignore method.childParameterType
      */
     #[Override]
     public function get(string $id): ?object {
@@ -60,11 +58,7 @@ final class Container implements ContainerInterface {
         throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));
     }
 
-    /**
-     * @param class-string<object> $id
-     *
-     * @phpstan-ignore method.childParameterType
-     */
+    /** @param class-string<object> $id */
     #[Override]
     public function has(string $id): bool {
         if ($this->autowire === true) {

@@ -24,6 +24,9 @@ parameters:
     reportWrongPhpDocTypeInVarTag: true
     reportAnyTypeWideningInVarTag: true
     checkMissingOverrideMethodAttribute: true
+    ignoreErrors:
+        - "#^Parameter \\#1 \\$id \\(class\\-string\\<T of object\\>\\) of method PrinsFrank\\\\Container\\\\Container\\:\\:get\\(\\) should be contravariant with parameter \\$id \\(string\\) of method Psr\\\\Container\\\\ContainerInterface\\:\\:get\\(\\)$#"
+        - "#^Parameter \\#1 \\$id \\(class\\-string\\<object\\>\\) of method PrinsFrank\\\\Container\\\\Container\\:\\:has\\(\\) should be contravariant with parameter \\$id \\(string\\) of method Psr\\\\Container\\\\ContainerInterface\\:\\:has\\(\\)$#"
 includes:
     - phar://phpstan.phar/conf/bleedingEdge.neon
     - vendor/phpstan/phpstan-strict-rules/rules.neon
