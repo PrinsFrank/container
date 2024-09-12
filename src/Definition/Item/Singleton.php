@@ -25,7 +25,7 @@ class Singleton implements Definition {
 
     /**
      * @param class-string<T> $identifier
-     * @param Closure(): T|Closure(): null $new
+     * @param Closure(mixed ...): (T|null) $new
      * @throws InvalidArgumentException
      */
     public function __construct(
