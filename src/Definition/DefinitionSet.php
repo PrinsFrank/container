@@ -13,7 +13,9 @@ class DefinitionSet {
     /** @var list<Definition<covariant object>> */
     private array $definitions = [];
 
-    public function __construct(public readonly Container $forContainer, public readonly ParameterResolver $parameterResolver) {
+    public function __construct(
+        public readonly Container $forContainer,
+    ) {
     }
 
     /**
@@ -36,13 +38,13 @@ class DefinitionSet {
      * @throws MissingDefinitionException|ShouldNotHappenException
      * @return T|null
      */
-    public function get(string $identifier, Container $container): ?object {
+    public function get(string $identifier, Container $container, ParameterResolver $parameterResolver): ?object {
         foreach ($this->definitions as $definition) {
             if ($definition->isFor($identifier) === false) {
                 continue;
             }
 
-            $item = $definition->get($container, $this->parameterResolver);
+            $item = $definition->get($container, $parameterResolver);
             if ($item !== null && is_a($item, $identifier, true) === false) {
                 throw new ShouldNotHappenException(sprintf('The container returned an %s but expected to return a %s', gettype($item), $identifier));
             }
