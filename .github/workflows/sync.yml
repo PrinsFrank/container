@@ -7,4 +7,7 @@ on:
 
 jobs:
   quality:
+    permissions:
+      contents: write
+      pull-requests: write
     uses: prinsfrank/CI-PHP/.github/workflows/template-sync.yml@main
