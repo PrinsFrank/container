@@ -43,9 +43,9 @@ class Singleton implements Definition {
 
     /** @throws UnresolvableException|InvalidServiceProviderException|MissingDefinitionException */
     #[Override]
-    public function get(Container $container, ParameterResolver $parameterResolver): ?object {
+    public function get(Container $container): ?object {
         if (isset($this->instance) === false) {
-            $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));
+            $resolved = ($this->new)(...ParameterResolver::resolveParamsForClosure($this->new, $container));
             if ($resolved !== null && $resolved instanceof $this->identifier === false) {
                 throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', $resolved instanceof stdClass ? get_class($resolved) : gettype($resolved), $this->identifier));
             }

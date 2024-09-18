@@ -8,7 +8,6 @@ use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Definition\DefinitionSet;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
-use PrinsFrank\Container\Resolver\ParameterResolver;
 use PrinsFrank\Container\ServiceProvider\ContainerProvider;
 
 #[CoversClass(ContainerProvider::class)]
@@ -23,14 +22,12 @@ class ContainerProviderTest extends TestCase {
 
     /** @throws InvalidArgumentException|MissingDefinitionException */
     public function testRegister(): void {
-        $container = new Container();
-        $resolvedSet = new DefinitionSet();
         (new ContainerProvider())
-            ->register(Container::class, $resolvedSet, $container);
+            ->register(Container::class, $resolvedSet = new DefinitionSet(), $container = new Container());
 
         static::assertSame(
             $container,
-            $resolvedSet->get(Container::class, $container, new ParameterResolver($container))
+            $resolvedSet->get(Container::class, $container)
         );
     }
 }

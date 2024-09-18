@@ -7,8 +7,8 @@ use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Definition\Item\Definition;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\ShouldNotHappenException;
-use PrinsFrank\Container\Resolver\ParameterResolver;
 
+/** @internal */
 class DefinitionSet {
     /** @var list<Definition<covariant object>> */
     private array $definitions = [];
@@ -33,13 +33,13 @@ class DefinitionSet {
      * @throws MissingDefinitionException|ShouldNotHappenException
      * @return T|null
      */
-    public function get(string $identifier, Container $container, ParameterResolver $parameterResolver): ?object {
+    public function get(string $identifier, Container $container): ?object {
         foreach ($this->definitions as $definition) {
             if ($definition->isFor($identifier) === false) {
                 continue;
             }
 
-            $item = $definition->get($container, $parameterResolver);
+            $item = $definition->get($container);
             if ($item !== null && is_a($item, $identifier, true) === false) {
                 throw new ShouldNotHappenException(sprintf('The container returned an %s but expected to return a %s', gettype($item), $identifier));
             }

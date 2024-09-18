@@ -40,8 +40,8 @@ class Concrete implements Definition {
 
     /** @throws UnresolvableException|InvalidServiceProviderException|MissingDefinitionException */
     #[Override]
-    public function get(Container $container, ParameterResolver $parameterResolver): ?object {
-        $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));
+    public function get(Container $container): ?object {
+        $resolved = ($this->new)(...ParameterResolver::resolveParamsForClosure($this->new, $container));
         if ($resolved !== null && $resolved instanceof $this->identifier === false) {
             throw new InvalidServiceProviderException(sprintf('Closure returned type "%s" instead of "%s"', $resolved instanceof stdClass ? get_class($resolved) : gettype($resolved), $this->identifier));
         }

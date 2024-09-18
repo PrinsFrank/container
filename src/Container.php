@@ -18,11 +18,9 @@ final class Container implements ContainerInterface {
     /** @var list<ServiceProviderInterface> */
     private array $serviceProviders = [];
     private readonly DefinitionSet $resolvedSet;
-    private readonly ParameterResolver $parameterResolver;
 
     public function __construct(bool $allowSelfResolve = true, private readonly bool $autowire = true) {
         $this->resolvedSet = new DefinitionSet();
-        $this->parameterResolver = new ParameterResolver($this);
         if ($allowSelfResolve === true) {
             $this->addServiceProvider(new ContainerProvider());
         }
@@ -41,7 +39,7 @@ final class Container implements ContainerInterface {
         }
 
         if ($this->resolvedSet->has($id)) {
-            return $this->resolvedSet->get($id, $this, $this->parameterResolver);
+            return $this->resolvedSet->get($id, $this);
         }
 
         foreach ($this->serviceProviders as $serviceProvider) {
@@ -54,11 +52,11 @@ final class Container implements ContainerInterface {
                 throw new InvalidServiceProviderException(sprintf('Provider "%s" said it would provide "%s" but after registering it is not resolvable', $serviceProvider::class, $id));
             }
 
-            return $this->resolvedSet->get($id, $this, $this->parameterResolver);
+            return $this->resolvedSet->get($id, $this);
         }
 
         if ($this->autowire === true && class_exists($id) === true && interface_exists($id) === false) {
-            return method_exists($id, '__construct') === false ? new $id() : new $id(...$this->parameterResolver->resolveParamsForMethod($id, '__construct'));
+            return method_exists($id, '__construct') === false ? new $id() : new $id(...ParameterResolver::resolveParamsForMethod($id, '__construct', $this));
         }
 
         throw new UnresolvableException(sprintf('Id "%s" is not resolvable', $id));
@@ -82,7 +80,7 @@ final class Container implements ContainerInterface {
         }
 
         if ($this->autowire === true && interface_exists($id) === false
-            && (method_exists($id, '__construct') === false || $this->parameterResolver->canResolveParamsForMethod($id, '__construct'))) {
+            && (method_exists($id, '__construct') === false || ParameterResolver::canResolveParamsForMethod($id, '__construct', $this))) {
             return true;
         }
 

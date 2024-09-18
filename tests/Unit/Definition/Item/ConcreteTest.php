@@ -10,7 +10,6 @@ use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
-use PrinsFrank\Container\Resolver\ParameterResolver;
 use PrinsFrank\Container\Tests\Fixtures\AbstractBImplementsInterfaceA;
 use PrinsFrank\Container\Tests\Fixtures\ConcreteCExtendsAbstractBImplementsInterfaceA;
 use PrinsFrank\Container\Tests\Fixtures\InterfaceA;
@@ -48,7 +47,7 @@ class ConcreteTest extends TestCase {
 
         $this->expectException(InvalidServiceProviderException::class);
         $this->expectExceptionMessage('Closure returned type "integer" instead of "' . ConcreteCExtendsAbstractBImplementsInterfaceA::class . '"');
-        $abstractConcrete->get($container = new Container(), new ParameterResolver($container));
+        $abstractConcrete->get(new Container());
     }
 
     /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidArgumentException */
@@ -57,7 +56,7 @@ class ConcreteTest extends TestCase {
 
         $this->expectException(InvalidServiceProviderException::class);
         $this->expectExceptionMessage('Closure returned type "stdClass" instead of "' . ConcreteCExtendsAbstractBImplementsInterfaceA::class . '"');
-        $abstractConcrete->get($container = new Container(), new ParameterResolver($container));
+        $abstractConcrete->get(new Container());
     }
 
     /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidArgumentException */
@@ -67,7 +66,7 @@ class ConcreteTest extends TestCase {
 
         static::assertSame(
             $concrete,
-            $abstractConcrete->get($container = new Container(), new ParameterResolver($container)),
+            $abstractConcrete->get(new Container()),
         );
     }
 
@@ -75,6 +74,6 @@ class ConcreteTest extends TestCase {
     public function testResolveAllowsNullValue(): void {
         $abstractConcrete = new Concrete(ConcreteCExtendsAbstractBImplementsInterfaceA::class, fn () => null);
 
-        static::assertNull($abstractConcrete->get($container = new Container(), new ParameterResolver($container)));
+        static::assertNull($abstractConcrete->get(new Container()));
     }
 }

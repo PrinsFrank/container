@@ -12,17 +12,13 @@ use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionNamedType;
 
+/** @internal */
 final class ParameterResolver {
-    public function __construct(
-        private readonly Container $container,
-    ) {
-    }
-
     /**
      * @param class-string<object> $identifier
      * @param non-empty-string $methodName
      */
-    public function canResolveParamsForMethod(string $identifier, string $methodName): bool {
+    public static function canResolveParamsForMethod(string $identifier, string $methodName, Container $container): bool {
         if (method_exists($identifier, $methodName) === false) {
             throw new InvalidArgumentException(sprintf('Method "%s" does not exist on "%s"', $methodName, $identifier));
         }
@@ -33,7 +29,7 @@ final class ParameterResolver {
                 return false;
             }
 
-            if ($this->container->has($parameterType->getName()) === false) {
+            if ($container->has($parameterType->getName()) === false) {
                 return false;
             }
         }
@@ -47,7 +43,7 @@ final class ParameterResolver {
      * @throws InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return array<mixed>
      */
-    public function resolveParamsForMethod(string $identifier, string $methodName): array {
+    public static function resolveParamsForMethod(string $identifier, string $methodName, Container $container): array {
         if (method_exists($identifier, $methodName) === false) {
             throw new InvalidArgumentException(sprintf('Method "%s" does not exist on "%s"', $methodName, $identifier));
         }
@@ -59,7 +55,7 @@ final class ParameterResolver {
                 throw new UnresolvableException(sprintf('Parameter %s for %s::%s is not resolvable as it doesn\'t have a type specified', $key, $identifier, $methodName));
             }
 
-            $params[] = $this->optionallyResolve($parameterType->getName(), $parameterType->allowsNull());
+            $params[] = self::optionallyResolve($parameterType->getName(), $parameterType->allowsNull(), $container);
         }
 
         return $params;
@@ -69,7 +65,7 @@ final class ParameterResolver {
      * @throws InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return array<mixed>
      */
-    public function resolveParamsForClosure(Closure $closure): array {
+    public static function resolveParamsForClosure(Closure $closure, Container $container): array {
         $params = [];
         foreach (($reflectionFunction = (new ReflectionFunction($closure)))->getParameters() as $key => $parameterReflection) {
             $parameterType = $parameterReflection->getType();
@@ -77,7 +73,7 @@ final class ParameterResolver {
                 throw new UnresolvableException(sprintf('Parameter %s for closure at %s::%s is not resolvable as it doesn\'t have a type specified', $key, $reflectionFunction->getFileName(), $reflectionFunction->getStartLine()));
             }
 
-            $params[] = $this->optionallyResolve($parameterType->getName(), $parameterType->allowsNull());
+            $params[] = self::optionallyResolve($parameterType->getName(), $parameterType->allowsNull(), $container);
         }
 
         return $params;
@@ -89,13 +85,13 @@ final class ParameterResolver {
      * @throws InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return T|null
      */
-    private function optionallyResolve(string $identifier, bool $allowsNull): ?object {
+    private static function optionallyResolve(string $identifier, bool $allowsNull, Container $container): ?object {
         if ($allowsNull === false) {
-            return $this->container->get($identifier);
+            return $container->get($identifier);
         }
 
         try {
-            return $this->container->get($identifier);
+            return $container->get($identifier);
         } catch (UnresolvableException $e) {
             return null;
         }
