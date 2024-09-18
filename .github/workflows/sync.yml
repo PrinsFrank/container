@@ -1,0 +1,10 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '55 18 * * *'
+
+jobs:
+  quality:
+    uses: prinsfrank/CI-PHP/.github/workflows/template-sync.yml@main
