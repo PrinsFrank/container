@@ -11,6 +11,7 @@
     failOnSkipped="true"
     beStrictAboutOutputDuringTests="true"
     beStrictAboutChangesToGlobalState="true"
+    cacheDirectory="./cache/.phpunit.result.cache"
 >
     <testsuites>
         <testsuite name="Unit">
