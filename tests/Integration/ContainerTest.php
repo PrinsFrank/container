@@ -28,15 +28,17 @@ class ContainerTest extends TestCase {
             /** @throws ContainerException */
             #[Override]
             public function register(string $identifier, DefinitionSet $resolvedSet): void {
-                $resolvedSet->add(new Singleton(DateTime::class, fn () => new DateTime()));
+                $resolvedSet->add(new Singleton(DateTime::class, fn () => new DateTime('2001-01-01 01:01:01')));
             }
         });
 
         $firstResolveResult = $container->get(DateTime::class);
         static::assertInstanceOf(DateTime::class, $firstResolveResult);
+        static::assertSame('2001-01-01 01:01:01', $firstResolveResult->format('Y-m-d H:i:s'));
 
         $secondResolveResult = $container->get(DateTime::class);
         static::assertInstanceOf(DateTime::class, $secondResolveResult);
+        static::assertSame('2001-01-01 01:01:01', $secondResolveResult->format('Y-m-d H:i:s'));
         static::assertSame($firstResolveResult, $secondResolveResult);
     }
 
@@ -58,9 +60,11 @@ class ContainerTest extends TestCase {
 
         $firstResolveResult = $container->get(DateTimeInterface::class);
         static::assertInstanceOf(DateTime::class, $firstResolveResult);
+        static::assertSame('2001-01-01 01:01:01', $firstResolveResult->format('Y-m-d H:i:s'));
 
         $secondResolveResult = $container->get(DateTimeInterface::class);
         static::assertInstanceOf(DateTime::class, $secondResolveResult);
+        static::assertSame('2001-01-01 01:01:01', $secondResolveResult->format('Y-m-d H:i:s'));
         static::assertNotSame($firstResolveResult, $secondResolveResult);
         static::assertEquals($firstResolveResult, $secondResolveResult);
     }
@@ -83,9 +87,11 @@ class ContainerTest extends TestCase {
 
         $firstResolveResult = $container->get(DateTime::class);
         static::assertInstanceOf(DateTime::class, $firstResolveResult);
+        static::assertSame('2001-01-01 01:01:01', $firstResolveResult->format('Y-m-d H:i:s'));
 
         $secondResolveResult = $container->get(DateTime::class);
         static::assertInstanceOf(DateTime::class, $secondResolveResult);
+        static::assertSame('2001-01-01 01:01:01', $secondResolveResult->format('Y-m-d H:i:s'));
         static::assertNotSame($firstResolveResult, $secondResolveResult);
         static::assertEquals($firstResolveResult, $secondResolveResult);
     }
