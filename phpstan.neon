@@ -16,8 +16,6 @@ parameters:
             - 'PHPUnit\Framework\MockObject\Exception'
             - 'ReflectionException'
             - 'SebastianBergmann\RecursionContext\InvalidArgumentException'
-            - 'PrinsFrank\Container\Exception\ShouldNotHappenException'
-            - 'PrinsFrank\Container\Exception\InvalidArgumentException'
     treatPhpDocTypesAsCertain: false
     checkBenevolentUnionTypes: true
     reportPossiblyNonexistentGeneralArrayOffset: true
@@ -25,11 +23,6 @@ parameters:
     reportWrongPhpDocTypeInVarTag: true
     reportAnyTypeWideningInVarTag: true
     checkMissingOverrideMethodAttribute: true
-    ignoreErrors:
-        -
-            path: src/Container.php
-            identifier: method.childParameterType
-            count: 2
 includes:
     - phar://phpstan.phar/conf/bleedingEdge.neon
     - vendor/phpstan/phpstan-strict-rules/rules.neon
