@@ -1,4 +1,4 @@
-name: CI
+name: Sync from Template
 
 on:
   workflow_dispatch:
