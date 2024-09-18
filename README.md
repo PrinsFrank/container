@@ -15,7 +15,7 @@
 ## Setup
 
 > **Note**
-> Make sure you are running PHP 8.3 or higher to use this package
+> Make sure you are running PHP 8.1 or higher to use this package
 
 To start right away, run the following command in your composer project;
 
