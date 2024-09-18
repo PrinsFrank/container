@@ -7,7 +7,6 @@ use Closure;
 use Override;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
-use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
@@ -39,7 +38,7 @@ class Concrete implements Definition {
         return is_a($identifier, $this->identifier, true);
     }
 
-    /** @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException|MissingDefinitionException */
+    /** @throws UnresolvableException|InvalidServiceProviderException|MissingDefinitionException */
     #[Override]
     public function get(Container $container, ParameterResolver $parameterResolver): ?object {
         $resolved = ($this->new)(...$parameterResolver->resolveParamsForClosure($this->new));

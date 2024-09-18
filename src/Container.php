@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace PrinsFrank\Container;
 
 use Override;
-use PrinsFrank\Container\Exception\InvalidMethodException;
+use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
@@ -29,11 +29,15 @@ final class Container implements ContainerInterface {
     /**
      * @template T of object
      * @param class-string<T> $id
-     * @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException|MissingDefinitionException
+     * @throws UnresolvableException|InvalidServiceProviderException|MissingDefinitionException
      * @return T|null
      */
     #[Override]
     public function get(string $id): ?object {
+        if (class_exists($id) === false && interface_exists($id) === false) {
+            throw new InvalidArgumentException(sprintf('%s is not an existing class or interface', $id));
+        }
+
         if ($this->resolvedSet->has($id)) {
             return $this->resolvedSet->get($id, $this);
         }
@@ -51,7 +55,7 @@ final class Container implements ContainerInterface {
             return $this->resolvedSet->get($id, $this);
         }
 
-        if ($this->autowire === true) {
+        if ($this->autowire === true && class_exists($id) === true && interface_exists($id) === false) {
             return method_exists($id, '__construct') === false ? new $id() : new $id(...$this->resolvedSet->parameterResolver->resolveParamsForMethod($id, '__construct'));
         }
 
@@ -61,8 +65,8 @@ final class Container implements ContainerInterface {
     /** @param class-string<object> $id */
     #[Override]
     public function has(string $id): bool {
-        if ($this->autowire === true) {
-            return true;
+        if (class_exists($id) === false && interface_exists($id) === false) {
+            throw new InvalidArgumentException(sprintf('%s is not an existing class or interface', $id));
         }
 
         if ($this->resolvedSet->has($id)) {
@@ -73,6 +77,11 @@ final class Container implements ContainerInterface {
             if ($serviceProvider->provides($id)) {
                 return true;
             }
+        }
+
+        if ($this->autowire === true && interface_exists($id) === false
+            && (method_exists($id, '__construct') === false || $this->resolvedSet->parameterResolver->canResolveParamsForMethod($id, '__construct'))) {
+            return true;
         }
 
         return false;

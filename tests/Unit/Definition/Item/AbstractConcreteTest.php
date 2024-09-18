@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Definition\Item\AbstractConcrete;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
-use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
@@ -35,7 +34,7 @@ class AbstractConcreteTest extends TestCase {
         static::assertFalse($abstractConcrete->isFor(ConcreteCExtendsAbstractBImplementsInterfaceA::class));
     }
 
-    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidMethodException|InvalidArgumentException */
+    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidArgumentException */
     public function testResolveThrowsExceptionWhenClosureReturnsInvalidType(): void {
         /** @phpstan-ignore argument.type */
         $abstractConcrete = new AbstractConcrete(InterfaceA::class, fn () => 42);
@@ -45,7 +44,7 @@ class AbstractConcreteTest extends TestCase {
         $abstractConcrete->get($container = new Container(), new ParameterResolver($container));
     }
 
-    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidMethodException|InvalidArgumentException */
+    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidArgumentException */
     public function testResolveThrowsExceptionWhenClosureReturnsInvalidClassType(): void {
         $abstractConcrete = new AbstractConcrete(InterfaceA::class, fn () => new stdClass());
 
@@ -54,7 +53,7 @@ class AbstractConcreteTest extends TestCase {
         $abstractConcrete->get($container = new Container(), new ParameterResolver($container));
     }
 
-    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidMethodException|InvalidArgumentException */
+    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidArgumentException */
     public function testResolve(): void {
         $concrete = new ConcreteCExtendsAbstractBImplementsInterfaceA();
         $abstractConcrete = new AbstractConcrete(InterfaceA::class, fn () => $concrete);
@@ -65,7 +64,7 @@ class AbstractConcreteTest extends TestCase {
         );
     }
 
-    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidMethodException|InvalidArgumentException */
+    /** @throws InvalidServiceProviderException|MissingDefinitionException|UnresolvableException|InvalidArgumentException */
     public function testResolveAllowsNullValue(): void {
         $abstractConcrete = new AbstractConcrete(InterfaceA::class, fn () => null);
 

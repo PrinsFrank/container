@@ -13,7 +13,11 @@ use PrinsFrank\Container\Definition\Item\AbstractConcrete;
 use PrinsFrank\Container\Definition\Item\Concrete;
 use PrinsFrank\Container\Definition\Item\Singleton;
 use PrinsFrank\Container\Exception\ContainerException;
+use PrinsFrank\Container\Exception\UnresolvableException;
 use PrinsFrank\Container\ServiceProvider\ServiceProviderInterface;
+use PrinsFrank\Container\Tests\Fixtures\ConstructorOptionalInterfaceA;
+use PrinsFrank\Container\Tests\Fixtures\ConstructorRequiredInterfaceA;
+use PrinsFrank\Container\Tests\Fixtures\InterfaceA;
 
 class ContainerTest extends TestCase {
     /** @throws ContainerException */
@@ -94,5 +98,23 @@ class ContainerTest extends TestCase {
         static::assertSame('2001-01-01 01:01:01', $secondResolveResult->format('Y-m-d H:i:s'));
         static::assertNotSame($firstResolveResult, $secondResolveResult);
         static::assertEquals($firstResolveResult, $secondResolveResult);
+    }
+
+    /** @throws ContainerException */
+    public function testDoesntResolvesNonConfiguredRequiredInterface(): void {
+        $container = new Container();
+
+        static::expectException(UnresolvableException::class);
+        static::expectExceptionMessage(sprintf('Id "%s" is not resolvable', InterfaceA::class));
+        $container->get(ConstructorRequiredInterfaceA::class);
+    }
+
+    /** @throws ContainerException */
+    public function testResolvesNonConfiguredOptionalInterface(): void {
+        $container = new Container();
+
+        $resolvedClass = $container->get(ConstructorOptionalInterfaceA::class);
+        static::assertNotNull($resolvedClass);
+        static::assertNull($resolvedClass->interfaceA);
     }
 }

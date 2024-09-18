@@ -17,6 +17,7 @@ parameters:
             - 'ReflectionException'
             - 'SebastianBergmann\RecursionContext\InvalidArgumentException'
             - 'PrinsFrank\Container\Exception\ShouldNotHappenException'
+            - 'PrinsFrank\Container\Exception\InvalidArgumentException'
     treatPhpDocTypesAsCertain: false
     checkBenevolentUnionTypes: true
     reportPossiblyNonexistentGeneralArrayOffset: true

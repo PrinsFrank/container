@@ -4,7 +4,7 @@ namespace PrinsFrank\Container\Resolver;
 
 use Closure;
 use PrinsFrank\Container\Container;
-use PrinsFrank\Container\Exception\InvalidMethodException;
+use PrinsFrank\Container\Exception\InvalidArgumentException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
@@ -21,12 +21,35 @@ final class ParameterResolver {
     /**
      * @param class-string<object> $identifier
      * @param non-empty-string $methodName
-     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
+     */
+    public function canResolveParamsForMethod(string $identifier, string $methodName): bool {
+        if (method_exists($identifier, $methodName) === false) {
+            throw new InvalidArgumentException(sprintf('Method "%s" does not exist on "%s"', $methodName, $identifier));
+        }
+
+        foreach ((new ReflectionMethod($identifier, $methodName))->getParameters() as $parameterReflection) {
+            $parameterType = $parameterReflection->getType();
+            if ($parameterType instanceof ReflectionNamedType === false || (class_exists($parameterType->getName()) === false && interface_exists($parameterType->getName()) === false)) {
+                return false;
+            }
+
+            if ($this->container->has($parameterType->getName()) === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param class-string<object> $identifier
+     * @param non-empty-string $methodName
+     * @throws InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return array<mixed>
      */
     public function resolveParamsForMethod(string $identifier, string $methodName): array {
         if (method_exists($identifier, $methodName) === false) {
-            throw new InvalidMethodException(sprintf('Method "%s" does not exist on "%s"', $methodName, $identifier));
+            throw new InvalidArgumentException(sprintf('Method "%s" does not exist on "%s"', $methodName, $identifier));
         }
 
         $params = [];
@@ -43,7 +66,7 @@ final class ParameterResolver {
     }
 
     /**
-     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
+     * @throws InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return array<mixed>
      */
     public function resolveParamsForClosure(Closure $closure): array {
@@ -63,7 +86,7 @@ final class ParameterResolver {
     /**
      * @template T of object
      * @param class-string<T> $identifier
-     * @throws InvalidMethodException|InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
+     * @throws InvalidServiceProviderException|UnresolvableException|MissingDefinitionException
      * @return T|null
      */
     private function optionallyResolve(string $identifier, bool $allowsNull): ?object {

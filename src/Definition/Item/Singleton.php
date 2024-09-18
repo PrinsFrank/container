@@ -7,7 +7,6 @@ use Closure;
 use Override;
 use PrinsFrank\Container\Container;
 use PrinsFrank\Container\Exception\InvalidArgumentException;
-use PrinsFrank\Container\Exception\InvalidMethodException;
 use PrinsFrank\Container\Exception\InvalidServiceProviderException;
 use PrinsFrank\Container\Exception\MissingDefinitionException;
 use PrinsFrank\Container\Exception\UnresolvableException;
@@ -42,7 +41,7 @@ class Singleton implements Definition {
         return $identifier === $this->identifier;
     }
 
-    /** @throws UnresolvableException|InvalidServiceProviderException|InvalidMethodException|MissingDefinitionException */
+    /** @throws UnresolvableException|InvalidServiceProviderException|MissingDefinitionException */
     #[Override]
     public function get(Container $container, ParameterResolver $parameterResolver): ?object {
         if (isset($this->instance) === false) {
