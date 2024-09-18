@@ -21,7 +21,7 @@ final class Container implements ContainerInterface {
     private readonly ParameterResolver $parameterResolver;
 
     public function __construct(bool $allowSelfResolve = true, private readonly bool $autowire = true) {
-        $this->resolvedSet = new DefinitionSet($this);
+        $this->resolvedSet = new DefinitionSet();
         $this->parameterResolver = new ParameterResolver($this);
         if ($allowSelfResolve === true) {
             $this->addServiceProvider(new ContainerProvider());
@@ -49,7 +49,7 @@ final class Container implements ContainerInterface {
                 continue;
             }
 
-            $serviceProvider->register($id, $this->resolvedSet);
+            $serviceProvider->register($id, $this->resolvedSet, $this);
             if ($this->resolvedSet->has($id) === false) {
                 throw new InvalidServiceProviderException(sprintf('Provider "%s" said it would provide "%s" but after registering it is not resolvable', $serviceProvider::class, $id));
             }

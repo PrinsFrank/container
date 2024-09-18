@@ -24,9 +24,9 @@ class ContainerProviderTest extends TestCase {
     /** @throws InvalidArgumentException|MissingDefinitionException */
     public function testRegister(): void {
         $container = new Container();
-        $resolvedSet = new DefinitionSet($container);
+        $resolvedSet = new DefinitionSet();
         (new ContainerProvider())
-            ->register(Container::class, $resolvedSet);
+            ->register(Container::class, $resolvedSet, $container);
 
         static::assertSame(
             $container,

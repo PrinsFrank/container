@@ -16,11 +16,11 @@ final class ContainerProvider implements ServiceProviderInterface {
 
     /** @throws InvalidArgumentException */
     #[Override]
-    public function register(string $identifier, DefinitionSet $resolvedSet): void {
+    public function register(string $identifier, DefinitionSet $resolvedSet, Container $container): void {
         $resolvedSet->add(
             new Singleton(
                 Container::class,
-                fn () => $resolvedSet->forContainer
+                fn () => $container
             )
         );
     }
