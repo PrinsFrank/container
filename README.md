@@ -124,5 +124,5 @@ class FooApiServiceProvider implements ServiceProviderInterface {
 | DI'ed services in ServiceProvider Closures    | ✅          | ❌      | ❌      | ❌                   |
 | Autowiring                                    | ✅          | ✅      | ✅      | ✅                   |
 
-<sup>1</sup> Published as illuminate/container 
+<sup>1</sup> Published as illuminate/container  
 <sup>2</sup> Other than the psr/container interface
