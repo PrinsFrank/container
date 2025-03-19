@@ -29,7 +29,7 @@ final class ParameterResolver {
                 return false;
             }
 
-            if ($container->has($parameterType->getName()) === false) {
+            if (!$parameterType->allowsNull() && $container->has($parameterType->getName()) === false) {
                 return false;
             }
         }
